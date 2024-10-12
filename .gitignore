@@ -1,2 +1,4 @@
 *.pdf
 tmp
+.env
+docker-volumes
