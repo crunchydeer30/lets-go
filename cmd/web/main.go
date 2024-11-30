@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"html/template"
 	"net/http"
 
 	"github.com/crunchydeer30/lets-go/internal/models"
@@ -9,8 +10,9 @@ import (
 )
 
 type app struct {
-	logger   Logger
-	snippets *models.SnippetModel
+	logger        Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -23,12 +25,16 @@ func main() {
 	}
 	defer db.Close()
 
-	app := &app{
-		logger:   *logger,
-		snippets: &models.SnippetModel{DB: db},
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.error.Fatal(err)
 	}
 
-	db.Ping()
+	app := &app{
+		logger:        *logger,
+		snippets:      &models.SnippetModel{DB: db},
+		templateCache: templateCache,
+	}
 
 	server := &http.Server{
 		Addr:     ":" + cfg.Port,
