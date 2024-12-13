@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/crunchydeer30/lets-go/internal/models"
+	"github.com/go-playground/form/v4"
 	_ "github.com/lib/pq"
 )
 
@@ -13,6 +14,7 @@ type app struct {
 	logger        Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 func main() {
@@ -30,10 +32,13 @@ func main() {
 		logger.error.Fatal(err)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &app{
 		logger:        *logger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	server := &http.Server{
