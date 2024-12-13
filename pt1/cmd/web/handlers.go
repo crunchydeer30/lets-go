@@ -51,8 +51,10 @@ func (app *app) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	flash := app.sessionManager.PopString(r.Context(), "flash")
 	data := app.newTemplateData(r)
 	data.Snippet = snippet
+	data.Flash = flash
 
 	app.render(w, http.StatusOK, "view.html", data)
 }
@@ -64,15 +66,9 @@ func (app *app) snippetCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
 	var form snippetCreateForm
 
-	err = app.decodePostForm(r, &form)
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -82,7 +78,7 @@ func (app *app) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
 	form.CheckValue(validator.NotBlank(form.Content), "content", "This field cannot be blank")
 	form.CheckValue(validator.MaxChars(form.Title, 100), "title", "Title must not be more than 100 characters long")
 
-	if len(form.ValidationErrors) > 0 {
+	if !form.IsValid() {
 		data := app.newTemplateData(r)
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "create.html", data)
@@ -95,7 +91,6 @@ func (app *app) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
-
-	w.Write([]byte("Create a new snippet..."))
 }
