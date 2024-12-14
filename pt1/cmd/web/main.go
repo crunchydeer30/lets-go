@@ -50,12 +50,15 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:     ":" + cfg.Port,
-		ErrorLog: app.logger.error,
-		Handler:  app.routes(),
+		Addr:         ":" + cfg.Port,
+		ErrorLog:     app.logger.error,
+		Handler:      app.routes(),
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
-	app.logger.info.Printf("Starting server on http://localhost:%s", cfg.Port)
-	err = server.ListenAndServe()
+	app.logger.info.Printf("Starting server on https://localhost:%s", cfg.Port)
+	err = server.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	app.logger.error.Fatal(err)
 }
