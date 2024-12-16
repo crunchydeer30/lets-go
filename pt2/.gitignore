@@ -1,0 +1,6 @@
+*.pdf
+tmp
+.env
+docker-volumes
+data
+tls
