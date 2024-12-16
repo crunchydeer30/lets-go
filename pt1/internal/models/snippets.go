@@ -14,6 +14,12 @@ type Snippet struct {
 	Expires time.Time
 }
 
+type SnippetModelInterface interface {
+	Get(id int) (*Snippet, error)
+	Latest() ([]*Snippet, error)
+	Insert(title string, content string) (int, error)
+}
+
 type SnippetModel struct {
 	DB *sql.DB
 }
