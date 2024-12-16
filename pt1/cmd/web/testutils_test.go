@@ -18,7 +18,7 @@ type testServer struct {
 }
 
 func newTestApplication(t *testing.T) *app {
-	templateChache, err := newTemplateCache()
+	templateCache, err := newTemplateCache()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func newTestApplication(t *testing.T) *app {
 		logger:         *NewLogger(),
 		snippets:       &mocks.SnippetModel{},
 		users:          &mocks.UserModel{},
-		templateCache:  templateChache,
+		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
 	}
