@@ -3,6 +3,10 @@ bin = "./tmp/main"
 cmd = "go build -o ./tmp/main ./cmd/api/."
 include_dir = ["cmd", "internal", "ui/html"]
 log = "stdout"
+stop_on_error = true
 
 [run]
 cmd = "./tmp/main"
+
+[log]
+color = true
