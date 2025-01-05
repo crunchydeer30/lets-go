@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"greenlight/internal/data"
 	"log"
 	"net/http"
 	"os"
@@ -18,16 +19,13 @@ const version = "1.0.0"
 type application struct {
 	config Config
 	logger *log.Logger
+	models data.Models
 }
 
 func main() {
 	cfg := loadConfig()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	app := &application{
-		config: cfg,
-		logger: logger,
-	}
 
 	db, err := openDB(cfg)
 	if err != nil {
@@ -35,6 +33,12 @@ func main() {
 	}
 	defer db.Close()
 	logger.Printf("database connection pool established")
+
+	app := &application{
+		config: cfg,
+		logger: logger,
+		models: data.NewModels(db),
+	}
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
